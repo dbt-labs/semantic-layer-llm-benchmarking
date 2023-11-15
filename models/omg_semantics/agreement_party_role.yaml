@@ -1,0 +1,20 @@
+semantic_models:
+  - name: agreement_party_role
+    model: ref('agreement_party_role')
+    entities:
+      - name: agreement_identifier
+        type: foreign
+      - name: party_identifier
+        type: foreign
+      - name: party_role_code
+        type: primary
+    dimensions:
+      - name: effective_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: expiration_date
+        type: time
+        type_params:
+          time_granularity: day
+        

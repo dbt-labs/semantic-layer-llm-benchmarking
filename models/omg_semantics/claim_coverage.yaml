@@ -1,0 +1,13 @@
+semantic_models:
+  - name: claim_coverage
+    model: ref('claim_coverage')
+    entities:
+      - name: Policy_Coverage_Detail_Identifier
+        type: primary
+      - name: Claim_Identifier
+        type: foreign
+    dimensions:
+      - name: Effective_Date
+        type: time
+        type_params:
+          time_granularity: day

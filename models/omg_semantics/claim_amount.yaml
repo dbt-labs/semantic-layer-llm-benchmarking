@@ -1,0 +1,24 @@
+semantic_models:
+  - name: claim_amount
+    model: ref('claim_amount')
+    entities:
+      - name: Claim_Amount_Identifier
+        type: primary
+      - name: Claim_Identifier
+        type: foreign
+      - name: Claim_Offer_Identifier
+        type: foreign
+    defaults:
+      agg_time_dimension: Event_Date
+    dimensions:
+      - name: Amount_Type_Code
+        type: categorical
+      - name: Event_Date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: Insurance_Type_Code
+        type: categorical
+    measures:
+      - name: claim_amount
+        agg: sum
