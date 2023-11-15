@@ -45,3 +45,8 @@ semantic_models:
         type: time
         type_params:
           time_granularity: day
+    measures:
+      - name: claims 
+        expr: 1
+        agg: sum
+        create_metric: true
