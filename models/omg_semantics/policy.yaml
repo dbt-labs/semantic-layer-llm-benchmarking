@@ -1,0 +1,36 @@
+semantic_models:
+  - name: policy
+    model: ref('policy')
+    description: "A table containing policy records with attributes such as identifier, effective and expiration dates, policy number, status, and geographic location."
+    defaults:
+      agg_time_dimension: effective_date
+
+    entities:
+      - name: policy
+        type: primary
+        expr: Policy_Identifier
+
+    dimensions:
+      - name: effective_date
+        type: time
+        type_params:
+          time_granularity: day
+        expr: Effective_Date
+
+      - name: expiration_date
+        type: time
+        type_params:
+          time_granularity: day
+        expr: Expiration_Date
+
+      - name: policy_number
+        type: categorical
+        expr: Policy_Number
+
+      - name: status_code
+        type: categorical
+        expr: Status_Code
+
+      - name: geographic_location_identifier
+        type: categorical
+        expr: Geographic_Location_Identifier
