@@ -1,6 +1,8 @@
 semantic_models:
   - name: claim
     model: ref('claim')
+    defaults:
+      agg_time_dimension: claims_made_date
     entities:
       - name: catastrophe_identifier
         type: foreign
