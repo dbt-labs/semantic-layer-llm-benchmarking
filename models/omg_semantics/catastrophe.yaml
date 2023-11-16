@@ -7,9 +7,9 @@ semantic_models:
     dimensions:
       - name: catastrophe_type_code
         type: categorical
-      - name: Catastrophe_Name
+      - name: catastrophe_name
         type: categorical
-      - name: Industry_Catastrophe_Code
+      - name: industry_catastrophe_code
         type: categorical
-      - name: Company_Catastrophe_Code
+      - name: company_catastrophe_code
         type: categorical

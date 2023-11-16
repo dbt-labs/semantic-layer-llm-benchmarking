@@ -2,46 +2,46 @@ semantic_models:
   - name: claim
     model: ref('claim')
     entities:
-      - name: Catastrophe_Identifier
+      - name: catastrophe_identifier
         type: foreign
-      - name: Insurable_Object_Identifier
+      - name: insurable_object_identifier
         type: foreign
-      - name: Occurrence_Identifier
+      - name: occurrence_identifier
         type: foreign
-      - name: Claim_Identifier
+      - name: claim_identifier
         type: primary
     dimensions:
-      - name: Claim_Description
+      - name: claim_description
         type: categorical
       - name: company_claim_number
         type: categorical
-      - name: Company_Subclaim_Number
+      - name: company_subclaim_number
         type: categorical
-      - name: Claims_Made_Date
+      - name: claims_made_date
         type: time
         type_params:
           time_granularity: day
-      - name: Entry_Into_Claims_Made_Program_Date
+      - name: entry_into_claims_made_program_date
         type: time
         type_params:
           time_granularity: day
-      - name: Claim_Open_Date
+      - name: claim_open_date
         type: time
         type_params:
           time_granularity: day
-      - name: Claim_Close_Date
+      - name: claim_close_date
         type: time
         type_params:
           time_granularity: day
-      - name: Claim_Reopen_Date
+      - name: claim_reopen_date
         type: time
         type_params:
           time_granularity: day
-      - name: Claim_Status_Code
+      - name: claim_status_code
         type: time
         type_params:
           time_granularity: day
-      - name: Claim_Reported_Date
+      - name: claim_reported_date
         type: time
         type_params:
           time_granularity: day
