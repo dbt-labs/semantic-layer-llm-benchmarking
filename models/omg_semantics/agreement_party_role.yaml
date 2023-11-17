@@ -9,6 +9,10 @@ semantic_models:
         description: "Use this in coordination with filter on party_role_code to refer to agent_id or policyholder_id "
         type: foreign
     dimensions:
+      - name: party_identifier_dim
+        description: "Use this in coordination with filter on party_role_code to refer to agent_id or policyholder_id "
+        type: categorical
+        expr: party_identifier
       - name: effective_date
         type: time
         type_params:
