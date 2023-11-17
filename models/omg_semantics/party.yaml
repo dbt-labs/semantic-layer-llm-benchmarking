@@ -30,5 +30,5 @@ semantic_models:
 
       - name: party_type_code
         type: categorical
-        description: "If party_type_code = 'PH' then Party_Identifier refers to policy_holder_id, if party_type_code = 'AG' then Party_Identifier refers to agent_id"
+        description: "Must filter using this dimension if referring to agents or policyholders. If party_type_code = 'PH' then Party_Identifier refers to policy_holder_id, if party_type_code = 'AG' then Party_Identifier refers to agent_id"
         expr: Party_Type_Code
