@@ -1,0 +1,27 @@
+semantic_models:
+  - name: location_address
+    model: ref('location_address')
+    entities:
+      - name: location_address_identifier
+        type: primary
+    dimensions:
+      - name: line_1_address
+        type: categorical
+      - name: municipality_name
+        type: categorical
+      - name: postal_code
+        type: categorical
+      - name: state_code
+        type: categorical
+      - name: country_code
+        type: categorical
+      - name: line_2_address
+        type: categorical
+      - name: begin_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: end_date
+        type: time
+        type_params:
+          time_granularity: day 

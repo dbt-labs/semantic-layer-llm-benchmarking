@@ -1,0 +1,27 @@
+semantic_models:
+  - name: geographic_location
+    model: ref('geographic_location')
+    entities:
+      - name: geographic_location_identifier
+        type: primary
+      - name: parent_geographic_location_identifier
+        type: foreign
+      - name: location_address_identifier
+        type: foreign
+      - name: physical_location_identifier
+        type: foreign
+    dimensions:
+      - name: geographic_location_type_code
+        type: categorical
+      - name: location_code
+        type: categorical
+      - name: location_name
+        type: categorical
+      - name: location_number
+        type: categorical
+      - name: state_code
+        type: categorical
+      - name: year_built
+        type: categorical 
+      - name: premium
+        type: categorical

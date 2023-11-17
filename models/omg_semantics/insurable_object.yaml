@@ -1,0 +1,11 @@
+semantic_models:
+  - name: insurable_object
+    model: ref('insurable_object')
+    entities:
+      - name: insurable_object_identifier
+        type: primary
+      - name: geographic_location_identifier
+        type: foreign
+    dimensions:
+      - name: insurable_object_type_code
+        type: categorical

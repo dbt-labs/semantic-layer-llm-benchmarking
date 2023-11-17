@@ -1,0 +1,29 @@
+  semantic_models:
+  - name: occurence
+    model: ref('occurences')
+    entities:
+      - name: occurrence_identifier
+        type: primary
+      - name: catastrophic_event_identifier
+        type: foreign
+      - name: geographic_location_identifier
+        type: foreign
+    dimensions:
+      - name: occurence_begin_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: occurence_end_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: occurence_begin_time
+        type: time
+        type_params:
+          time_granularity: day
+      - name: occurence_end_time
+        type: time
+        type_params:
+          time_granularity: day
+      - name: occurence_type_name
+        type: categorical

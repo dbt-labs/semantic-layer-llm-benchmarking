@@ -1,0 +1,6 @@
+semantic_models:
+  - name: expense_reserve
+    model: ref('expense_reserve')
+    entities:
+      - name: claim_amount_identifier
+        type: foreign

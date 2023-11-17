@@ -1,0 +1,6 @@
+semantic_models:
+  - name: expense_payment
+    model: ref('expense_payment')
+    entities:
+      - name: claim_amount_identifier
+        type: foreign

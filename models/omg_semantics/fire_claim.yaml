@@ -1,0 +1,23 @@
+semantic_models:
+  - name: fire_claim
+    model: ref('fire_claim')
+    entities:
+      - name: policyno
+        type: primary
+      - name: claimnumber
+        type: foreign
+    dimensions:
+      - name: insuredlocation
+        type: categorical
+      - name: loss_ratio
+        type: categorical
+      - name: nearest_firestaion_miles
+        type: categorical
+      - name: number_of_firefighters
+        type: categorical
+      - name: fireplace
+        type: categorical
+      - name: year_built
+        type: categorical 
+      - name: premium
+        type: categorical
