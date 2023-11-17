@@ -6,6 +6,7 @@ semantic_models:
         type: primary
         expr: agreement_identifier
       - name: party_identifier
+        description: "Use this in coordination with filter on party_role_code to refer to agent_id or policyholder_id "
         type: foreign
     dimensions:
       - name: effective_date
