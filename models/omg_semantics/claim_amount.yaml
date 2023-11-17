@@ -2,8 +2,9 @@ semantic_models:
   - name: claim_amount
     model: ref('claim_amount')
     entities:
-      - name: claim_amount_identifier
+      - name: claim_amount
         type: primary
+        expr: claim_amount_identifier
       - name: claim_identifier
         type: foreign
       - name: claim_offer_identifier
@@ -20,5 +21,29 @@ semantic_models:
       - name: insurance_type_code
         type: categorical
     measures:
-      - name: claim_amount
+      - name: total_claim_amount
         agg: sum
+        expr: claim_amount
+metrics:
+ - name: loss_payment_amount
+   type: simple
+   label: Loss Payment Amount
+   type_params:
+    measure: total_claim_amount
+   filter: |
+     {{Dimension('claim_amount__has_loss_payment')}} = 1
+ - name: loss_reserve_amount
+   type: simple
+   label: loss_reserve_amount
+   type_params:
+    measure: total_claim_amount
+   filter: |
+     {{Dimension('claim_amount__has_loss_reserve')}} = 1
+ - name: loss_amount
+   type: derived
+   label: Loss Amount
+   type_params:
+    expr: loss_payment_amount + loss_reserve_amount
+    metrics: 
+      - name: loss_reserve_amount
+      - name: loss_payment_amount

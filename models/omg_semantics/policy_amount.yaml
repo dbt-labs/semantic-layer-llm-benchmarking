@@ -37,8 +37,12 @@ semantic_models:
           time_granularity: day
       - name: insurance_type_code
         type: categorical
+      - name: policy_amount_dim
+        type: categorical
+        expr: Policy_Amount
     measures:
       - name: total_policy_amount
         description: "The total amount associated with the policy."
         agg: sum
         expr: Policy_Amount
+        create_metric: true

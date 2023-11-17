@@ -7,8 +7,6 @@ semantic_models:
         type: foreign
       - name: assessment_identifier
         type: foreign
-      - name: party_role_code
-        type: foreign
     dimensions:
       - name: end_date
         type: time
@@ -18,3 +16,5 @@ semantic_models:
         type: time
         type_params:
           time_granularity: day
+      - name: party_role_code
+        type: categorical

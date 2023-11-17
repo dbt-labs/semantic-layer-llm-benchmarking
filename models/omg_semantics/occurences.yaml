@@ -9,13 +9,13 @@ semantic_models:
       - name: occurrence
         type: primary
         expr: Occurrence_Identifier
+      - name: geographic_location_identifier
+        type: foreign
+        expr: Geographic_Location_Identifier
     dimensions:
       - name: catastrophic_event_indicator
         type: categorical
         expr: Catastrophic_Event_Indicator
-      - name: geographic_location_identifier
-        type: categorical
-        expr: Geographic_Location_Identifier
       - name: occurrence_begin_date
         type: time
         type_params:
