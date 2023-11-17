@@ -8,7 +8,7 @@ semantic_models:
     entities:
       - name: party
         type: primary
-        description: specifies either for agents as agent_id or policy_holders as policyholder_id depending on the value of party_role_code
+        description: "Must filter 'party_type_code' if using. An identifier that specifies either agents via agent_id or policy_holders via policyholder_id depending on the value of party_role_code"
         expr: Party_Identifier
 
     dimensions:
@@ -30,5 +30,5 @@ semantic_models:
 
       - name: party_type_code
         type: categorical
-        description: if party_type_code = "PH" then Party_Identifier refers to policy_holder_id, if party_type_code = "AG" then Party_Identifier refers to agent_id
+        description: "If party_type_code = 'PH' then Party_Identifier refers to policy_holder_id, if party_type_code = 'AG' then Party_Identifier refers to agent_id"
         expr: Party_Type_Code
