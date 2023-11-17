@@ -9,4 +9,5 @@ semantic_models:
     dimensions:
       - name: has_premium
         type: categorical
+        description: "Filter on this to determine if row represents a premium. Filter should evaluate to 'has_premium = 1' if a premium and not if not a premium"
         expr: "1"
