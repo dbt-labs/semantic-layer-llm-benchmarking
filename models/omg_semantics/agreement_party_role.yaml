@@ -17,6 +17,7 @@ semantic_models:
         type_params:
           time_granularity: day
       - name: party_role_code
+        description: "Must filter using this dimension if referring to agents or policyholders. If party_role_code = 'PH' then Party_Identifier refers to policy_holder_id, if party_role_code = 'AG' then Party_Identifier refers to agent_id"
         type: categorical
 
         
