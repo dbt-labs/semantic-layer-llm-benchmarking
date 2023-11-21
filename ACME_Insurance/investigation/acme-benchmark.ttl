@@ -190,16 +190,6 @@ dwt:IQ_39301bf92f7e93608bff059c4a83a845
         QandA:expects  dwt:query-09478b45-7383-4608-b696-26f2f6bbe383 , dwt:query-3d645ba9-0c81-4143-9e80-da1fbdd2b9eb ;
         QandA:prompt   "Return agents and the policy they have sold that have had a claim and the corresponding expense reserve amount by agent id, policy number and claim number " .
 
-dwt:query-5544a771-f376-4238-91a0-ca0c0a3746ef
-        rdf:type          dwt:SqlQuery ;
-        QandA:inLanguage  QandA:SQL ;
-        QandA:queryText   "SELECT company_claim_number\nFROM claim\nwhere claim_close_date >= '2019-01-01' and claim_close_date <= '2019-12-31'" ;
-        dct:description   "Return all the claims by claim number that were closed in 2019" ;
-        dct:title         "LQLS: Return all the claims by claim number that were closed in 2019" ;
-        dwt:agentId       "myinsurancecompany" ;
-        dwt:content       "SELECT company_claim_number\nFROM claim\nwhere claim_close_date >= '2019-01-01' and claim_close_date <= '2019-12-31'" ;
-        dwt:projectId     "chat-with-the-data-benchmark" .
-
 dwt:IQ_66ee72a9520811428711bf451d1d1de7
         rdf:type       QandA:Inquiry ;
         QandA:expects  dwt:query-724db899-24ee-4bdd-adad-2270b14e3429 , dwt:query-3ff591a2-3a2a-47fb-a162-b9faf14f793e ;
@@ -244,11 +234,6 @@ dwt:query-785a48b0-c9f3-4fbc-a1c7-7e730d519a61
         dwt:agentId       "myinsurancecompany" ;
         dwt:content       "PREFIX : <https://myinsurancecompany.linked.data.world/d/chat-with-the-data-benchmark/>\nPREFIX in: <http://data.world/schema/insurance/>\n\nselect ?ClaimNumber ?ClaimOpenDate ?ClaimCloseDate\nwhere{\n    SERVICE :mapped {\n        ?claim rdf:type in:Claim;\n            in:claimNumber ?ClaimNumber;\n            in:claimOpenDate ?ClaimOpenDate;\n            in:claimCloseDate ?ClaimCloseDate;\n        .\n    }\n\n}\n" ;
         dwt:projectId     "chat-with-the-data-benchmark" .
-
-dwt:IQ_d51d706e4b7ef001706289b940f09b24
-        rdf:type       QandA:Inquiry ;
-        QandA:expects  dwt:query-5544a771-f376-4238-91a0-ca0c0a3746ef , dwt:query-97c94a18-22f3-44ed-9e2f-b6c69422bbf5 ;
-        QandA:prompt   "Return all the claims by claim number that were closed in 2019" .
 
 dwt:query-e2bac95a-bf53-4b69-b737-b4bd23ab46b8
         rdf:type          dwt:SparqlQuery ;
@@ -353,16 +338,6 @@ dwt:query-ef3e8311-fa4e-4119-b75e-943517f84766
         dct:title         "HQHS: AVG-Policy-Coverage-Claim-Loss Payment&Expense Payment&Expense Reserve&Loss Reserve" ;
         dwt:agentId       "myinsurancecompany" ;
         dwt:content       "PREFIX : <https://myinsurancecompany.linked.data.world/d/chat-with-the-data-benchmark/>\nPREFIX in: <http://data.world/schema/insurance/>\nSELECT  \n  ?policynumber  \n    (AVG(?loss) AS ?AvgLoss)\nWHERE {\nSERVICE :mapped {\n    ?pcd a in:PolicyCoverageDetail;\n        in:hasPolicy ?policy. \n\n     ?policy a in:Policy;\n            in:policyNumber ?policynumber;\n    .\n\n    ?claim in:against ?pcd.     \n        ?claim rdf:type in:Claim;\n            in:hasLossPayment [\n                in:lossPaymentAmount ?LossPaymentAmount;\n            ];\n            in:hasLossReserve [\n                in:lossReserveAmount ?LossReserveAmount;\n            ];\n            in:hasExpensePayment [\n                in:expensePaymentAmount ?ExpensePaymentAmount;\n            ];\n            in:hasExpenseReserve [\n                in:expenseReserveAmount ?ExpenseReserveAmount;\n            ];\n        .\n        bind (?LossPaymentAmount+ ?LossReserveAmount+ ?ExpensePaymentAmount + ?ExpenseReserveAmount as ?loss)\n\n    }\n\n}\ngroup by  ?policynumber" ;
-        dwt:projectId     "chat-with-the-data-benchmark" .
-
-dwt:query-a810b049-4cb7-4283-b376-54e99fc04302
-        rdf:type          dwt:SqlQuery ;
-        QandA:inLanguage  QandA:SQL ;
-        QandA:queryText   "SELECT\n    apr2.party_identifier as AgentID,\n#    apr1.party_identifier as PolicyHolderID, \n    policy_number,\n #   policy_amount as premium, \n #   catastrophe_name,\n    company_claim_number,\n    ca_lp.claim_amount as Loss_Payment_Amount\nFROM\n    Claim\n    inner join catastrophe on claim.catastrophe_identifier = catastrophe.catastrophe_identifier\n    inner join claim_amount ca_lp on claim.claim_identifier = ca_lp.claim_identifier\n    inner JOIN loss_payment ON ca_lp.claim_amount_identifier = loss_payment.claim_amount_identifier\n    inner join claim_amount ca_lr on claim.claim_identifier = ca_lr.claim_identifier\n    inner JOIN loss_reserve ON ca_lr.claim_amount_identifier = loss_reserve.claim_amount_identifier\n    inner join claim_amount ca_ep on claim.claim_identifier = ca_ep.claim_identifier\n    inner JOIN expense_payment ON ca_ep.claim_amount_identifier = expense_payment.claim_amount_identifier\n    inner join claim_amount ca_er on claim.claim_identifier = ca_er.claim_identifier\n    inner JOIN expense_reserve ON ca_er.claim_amount_identifier = expense_reserve.claim_amount_identifier\n    inner join claim_coverage on claim.claim_identifier = claim_coverage.claim_identifier\n    inner join policy_coverage_detail on claim_coverage.policy_coverage_detail_identifier = policy_coverage_detail.policy_coverage_detail_identifier\n    inner join policy on policy.policy_identifier = policy_coverage_detail.policy_identifier\n    inner join policy_amount on policy_coverage_detail.policy_coverage_detail_identifier = policy_amount.policy_coverage_detail_identifier\n    inner join  agreement_party_role apr1 on apr1.agreement_identifier = policy.policy_identifier\n    inner join  agreement_party_role apr2 on apr2.agreement_identifier = policy.policy_identifier\n    inner join premium on premium.policy_amount_identifier = policy_amount.policy_amount_identifier\nwhere apr1.party_role_code = 'PH' and apr2.party_role_code = 'AG'" ;
-        dct:description   "Return agents and the policies they have sold that have had a claim and the corresponding loss payment amount by agent id, policy number and claim number" ;
-        dct:title         "LQHS: Agent - Policy - Coverage - Claim - Loss Payment" ;
-        dwt:agentId       "myinsurancecompany" ;
-        dwt:content       "SELECT\n    apr2.party_identifier as AgentID,\n#    apr1.party_identifier as PolicyHolderID, \n    policy_number,\n #   policy_amount as premium, \n #   catastrophe_name,\n    company_claim_number,\n    ca_lp.claim_amount as Loss_Payment_Amount\nFROM\n    Claim\n    inner join catastrophe on claim.catastrophe_identifier = catastrophe.catastrophe_identifier\n    inner join claim_amount ca_lp on claim.claim_identifier = ca_lp.claim_identifier\n    inner JOIN loss_payment ON ca_lp.claim_amount_identifier = loss_payment.claim_amount_identifier\n    inner join claim_amount ca_lr on claim.claim_identifier = ca_lr.claim_identifier\n    inner JOIN loss_reserve ON ca_lr.claim_amount_identifier = loss_reserve.claim_amount_identifier\n    inner join claim_amount ca_ep on claim.claim_identifier = ca_ep.claim_identifier\n    inner JOIN expense_payment ON ca_ep.claim_amount_identifier = expense_payment.claim_amount_identifier\n    inner join claim_amount ca_er on claim.claim_identifier = ca_er.claim_identifier\n    inner JOIN expense_reserve ON ca_er.claim_amount_identifier = expense_reserve.claim_amount_identifier\n    inner join claim_coverage on claim.claim_identifier = claim_coverage.claim_identifier\n    inner join policy_coverage_detail on claim_coverage.policy_coverage_detail_identifier = policy_coverage_detail.policy_coverage_detail_identifier\n    inner join policy on policy.policy_identifier = policy_coverage_detail.policy_identifier\n    inner join policy_amount on policy_coverage_detail.policy_coverage_detail_identifier = policy_amount.policy_coverage_detail_identifier\n    inner join  agreement_party_role apr1 on apr1.agreement_identifier = policy.policy_identifier\n    inner join  agreement_party_role apr2 on apr2.agreement_identifier = policy.policy_identifier\n    inner join premium on premium.policy_amount_identifier = policy_amount.policy_amount_identifier\nwhere apr1.party_role_code = 'PH' and apr2.party_role_code = 'AG'" ;
         dwt:projectId     "chat-with-the-data-benchmark" .
 
 dwt:query-f6d8c266-20a4-4015-b302-8ebb17e44ffd
@@ -825,16 +800,6 @@ dwt:query-f16d0623-ae64-41c6-af76-6df3964334ab
         dwt:content       "PREFIX : <https://myinsurancecompany.linked.data.world/d/chat-with-the-data-benchmark/>\nPREFIX in: <http://data.world/schema/insurance/>\n\nSELECT ?policynumber ?PolicyHolderID ?premium\nWHERE {\nSERVICE :mapped {\n    ?pcd a in:PolicyCoverageDetail;\n        in:hasPremiumAmount [ \n            in:premiumAmount ?premium;\n        ];\n        in:hasPolicy ?policy. \n\n     ?policy a in:Policy;\n            in:policyNumber ?policynumber;\n            in:hasPolicyHolder [ \n                in:policyHolderId ?PolicyHolderID \n            ];\n    .\n    }\n}\n" ;
         dwt:projectId     "chat-with-the-data-benchmark" .
 
-dwt:query-97c94a18-22f3-44ed-9e2f-b6c69422bbf5
-        rdf:type          dwt:SparqlQuery ;
-        QandA:inLanguage  QandA:SPARQL ;
-        QandA:queryText   "PREFIX : <https://myinsurancecompany.linked.data.world/d/chat-with-the-data-benchmark/>\nPREFIX ds-omg-pc-database: <https://myinsurancecompany.linked.data.world/d/omg-pc-database/>\nPREFIX in: <http://data.world/schema/insurance/>\n\nselect ?ClaimNumber\nwhere{\n    SERVICE ds-omg-pc-database:mapped {\n        ?claim rdf:type in:Claim;\n            in:claimNumber ?ClaimNumber;\n            in:claimOpenDate ?ClaimOpenDate;\n            in:claimCloseDate ?ClaimCloseDate;\n        .\n        FILTER(?ClaimCloseDate >= '2019-01-01' && ?ClaimCloseDate <= '2019-12-31')\n    }\n\n}\n" ;
-        dct:description   "Return all the claims by claim number that were closed in 2019" ;
-        dct:title         "LQLS: Return all the claims by claim number that were closed in 2019" ;
-        dwt:agentId       "myinsurancecompany" ;
-        dwt:content       "PREFIX : <https://myinsurancecompany.linked.data.world/d/chat-with-the-data-benchmark/>\nPREFIX ds-omg-pc-database: <https://myinsurancecompany.linked.data.world/d/omg-pc-database/>\nPREFIX in: <http://data.world/schema/insurance/>\n\nselect ?ClaimNumber\nwhere{\n    SERVICE ds-omg-pc-database:mapped {\n        ?claim rdf:type in:Claim;\n            in:claimNumber ?ClaimNumber;\n            in:claimOpenDate ?ClaimOpenDate;\n            in:claimCloseDate ?ClaimCloseDate;\n        .\n        FILTER(?ClaimCloseDate >= '2019-01-01' && ?ClaimCloseDate <= '2019-12-31')\n    }\n\n}\n" ;
-        dwt:projectId     "chat-with-the-data-benchmark" .
-
 dwt:query-f638042e-9031-4b27-9b32-8ab0ec778106
         rdf:type          dwt:SparqlQuery ;
         QandA:inLanguage  QandA:SPARQL ;
@@ -928,7 +893,7 @@ dwt:query-0d8c074f-3c02-4c65-bc0a-b69da974889c
 
 dwt:IQ_b4236934056faa683bbcded57fb3c8e7
         rdf:type       QandA:Inquiry ;
-        QandA:expects  dwt:query-a810b049-4cb7-4283-b376-54e99fc04302 , dwt:query-af84cac7-7ff2-45b3-8ece-86020c65fb8f , dwt:query-e9216b56-5fef-433f-a2bd-89c7360d69ed ;
+        QandA:expects  dwt:query-af84cac7-7ff2-45b3-8ece-86020c65fb8f , dwt:query-e9216b56-5fef-433f-a2bd-89c7360d69ed ;
         QandA:prompt   "Return agents and the policies they have sold that have had a claim and the corresponding loss payment amount by agent id, policy number and claim number" .
 
 dwt:IQ_6f7ead3b85413d6fcba8b08522dbda69
