@@ -33,4 +33,3 @@ semantic_models:
         agg: sum
         expr: 1
         create_metric: true
-     

@@ -12,7 +12,7 @@ semantic_models:
         type: foreign
         expr: Geographic_Location_Identifier
       - name: policy
-        type: foreign
+        type: unique
         expr: Policy_Identifier
       - name: policy_coverage_detail
         type: foreign

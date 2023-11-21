@@ -49,8 +49,8 @@ semantic_models:
           time_granularity: day
     measures:
       - name: claims 
-        expr: 1
-        agg: sum
+        expr: company_claim_number
+        agg: count
         create_metric: true
       - name: avg_time_to_settle_claim
         expr: DATEDIFF('day', claim_open_date, claim_close_date)
