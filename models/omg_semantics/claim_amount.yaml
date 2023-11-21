@@ -39,7 +39,8 @@ metrics:
     measure: total_claim_amount
    filter: |
      {{Dimension('claim_amount__has_loss_reserve')}} = 1
- - name: loss_amount
+ - name: total_loss_amount
+   description: Sum of loss_payment_amount and loss_reserve_amount
    type: derived
    label: Loss Amount
    type_params:
