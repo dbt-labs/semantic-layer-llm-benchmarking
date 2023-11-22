@@ -1,0 +1,900 @@
+schemaVersion: 3
+meta:
+  sourceVersionId: d8d75426-9c8d-4f14-b29f-c52eaa71adb6 # DO NOT CHANGE - Hex uses this to match up project versions when reimporting the file
+  description: null
+  projectId: 78897c29-a7eb-495a-b87e-08bfb5a6e9f2 # DO NOT CHANGE - Unique ID of the project from which this file was generated
+  title: Semantic Layer LLM Benchmarking
+  timezone: null
+  appTheme: SYS_PREF
+  codeLanguage: PYTHON
+  status:
+    name: Exploratory
+  categories:
+    - name: Community
+  castDecimalsDefault: true
+  logicQueryCacheTimeout: null
+  publishedQueryCacheTimeout: null
+projectAssets:
+  dataConnections:
+    - dataConnectionId: ad65b5a2-dc76-4c1b-b45a-05ba3929bd1f # Snowflake Semantic Layer Sandbox (snowflake)
+  envVars: []
+  secrets:
+    - secretName: DBT_SL_SERVICE_TOKEN
+    - secretName: OPENAI_API_KEY
+sharedAssets:
+  secrets: []
+  vcsPackages: []
+  dataConnections:
+    - dataConnectionId: a6754d83-fb7d-4c25-8d96-a04da3c51c93 # [Prod] Snowflake (snowflake)
+    - dataConnectionId: cac4f249-c643-481e-9dbe-2c927e1e6880 # [Prod] Snowflake + Semantic Layer (snowflake)
+  externalFileIntegrations: []
+cells:
+  - cellType: MARKDOWN
+    cellId: a7cadd10-afb7-4be9-956f-0fb4d1e057ee # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: null
+    config:
+      source: |-
+        ## About the notebook
+        This Notebook is an accompaniment to: 
+        - [This Roundup article](https://roundup.getdbt.com)
+        - [This GitHub repo](https://github.com/dbt-labs/semantic-layer-llm-benchmarking)
+
+        and extends the work done in _A Benchmark to Understand the Role of Knowledge Graphs on Large Language Model's Accuracy for Question Answering on Enterprise SQL Databases_, [a preprint on arxiv.org](https://arxiv.org/pdf/2311.07509.pdf) from the team at data.world.
+
+        ## About the experiment
+        Using OpenAI's completions API (gpt-4), we provide a few-shot prompt to introduce the LLM to proper dbt SL syntax (which is otherwise not available due to the knowledge cutoff of April 2023) and ask it to generate a SL query to answer a selection of questions from the benchmark.
+
+        ## How to interact with the benchmark and our results:
+
+        - Review the snapshot in this Hex notebook - you can check out the dataframe called `dataframe` to see all results in place, which was created by unioning csv exports of smaller runs.
+        - Make a copy of [this Google Sheet](https://docs.google.com/spreadsheets/d/1n-o99KynLkgQu0QHLwmUVYk88QTfkbWgdors2nZFEXs/edit#gid=2130643231), which is a csv output of the notebook's final dataframe.
+        - Run the benchmark yourself by [making a copy of the notebook](https://learn.hex.tech/docs/explore-data/projects/import-export), then [providing your own dbt Cloud service token](https://docs.getdbt.com/docs/use-dbt-semantic-layer/quickstart-sl#set-up-dbt-semantic-layer) and OpenAI API key, and using the GitHub project linked above. 
+
+        Created by [Jason Ganz](https://www.linkedin.com/in/jasnonaz/), [Joel Labes](https://www.linkedin.com/in/joel-labes/) and [Jordan Stein](https://www.linkedin.com/in/jstein5/)
+  - cellType: INPUT
+    cellId: ada1c573-1b0d-4d24-bec4-7e0db5bd7302 # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: Number of iterations
+    config:
+      inputType: NUMERIC_INPUT
+      name: number_of_iterations
+      outputType: NUMBER
+      options: null
+      defaultValue: 5
+  - cellType: CODE
+    cellId: 2fd93b47-9d48-445d-9443-ff8cfd3cbeac # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: Load files
+    config:
+      source: |-
+        with open("ACME_small.ddl", "r") as ddl_file:
+            sql_ddl = ddl_file.read()
+  - cellType: CODE
+    cellId: 144bbe61-f35c-4244-8dd0-d18d4e38bde6 # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: Challenge Titles to Run
+    config:
+      source: |-
+        selected_challenges = [
+            "What is the total amount of premiums that a policy holder has paid by policy number?",
+            "What is the average time to settle a claim by policy number?",
+            "What is the total amount of premiums that a policy holder has paid?",
+            "How many policies have agents sold by agent id?",
+            "What is the total loss amounts, which is the sum of loss payment, loss reserve amount by claim number?",
+            "How many policies does each policy holder have by policy holder id?",
+            "What is the total amount of premiums paid by policy number?",
+            "How many claims have been placed by policy number?",
+            "What is the average policy size which is the the total amount of premium divided by the number of policies?",
+            "How many policies do we have?",
+            "How many claims do we have?"
+        ]
+  - cellType: CODE
+    cellId: b20ba3a5-295d-4f32-b5a9-589913e5d8ba # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: Filter to Selected Challenges and Extract Gold SQL
+    config:
+      source: |+
+        !pip install rdflib
+
+
+        from rdflib import Graph, Namespace, RDF, URIRef
+        import pandas as pd
+
+        # Load the TTL file into an RDF graph
+        graph = Graph()
+        graph.parse("benchmark_questions.ttl", format="ttl")
+
+        # Define namespaces
+        QANDA = Namespace("http://models.data.world/benchmarks/QandA#")
+        DWT = Namespace("https://templates.data.world/")
+        DCT = Namespace("http://purl.org/dc/terms/")
+        RDF_NS = RDF
+
+        # SPARQL query to retrieve records of rdf:type dwt:SqlQuery
+        sparql_query = """
+        PREFIX QandA: <http://models.data.world/benchmarks/QandA#>
+        PREFIX dct: <http://purl.org/dc/terms/>
+        PREFIX dwt: <https://templates.data.world/>
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+        SELECT ?title ?description ?queryText ?query 
+        WHERE {
+          ?query rdf:type dwt:SqlQuery ;
+                 QandA:queryText ?queryText ;
+                 dct:description ?description ;
+                 dct:title ?title ;
+        }
+        """
+
+        # Execute the SPARQL query
+        results = graph.query(sparql_query, initNs={"QandA": QANDA, "dct": DCT, "dwt": DWT, "rdf": RDF_NS})
+
+        # Create a DataFrame from the query results
+        all_challenges = pd.DataFrame(results, columns=['title', 'challenge_text', 'gold_query_text', 'gold_query_id'])
+
+        # Strip leading/trailing whitespace
+        all_challenges["challenge_text"] = all_challenges["challenge_text"].str.strip()
+
+
+        filtered_challenges = all_challenges[
+            all_challenges["challenge_text"].isin(selected_challenges)
+        ]
+
+        filtered_challenges
+
+  - cellType: CODE
+    cellId: d682659f-45ca-4eda-b2a7-f365b8960f36 # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: Run OpenAI Prompt
+    config:
+      source: |-
+        import openai
+        import time
+        from datetime import datetime
+        openai.api_key = OPENAI_API_KEY
+        OPENAI_API_HARD_LIMIT = 80000 #tokens per minute
+        OPENAI_API_SOFT_LIMIT = OPENAI_API_HARD_LIMIT * 0.75
+
+        rate_limit_minute = -1
+        rate_limit_tokens_consumed = 0
+
+        def execute_open_ai_prompt(prompt):
+            now = datetime.now()
+            global rate_limit_minute
+            global rate_limit_tokens_consumed
+            if rate_limit_minute != now.minute:
+                rate_limit_minute = now.minute
+                rate_limit_tokens_consumed = 0
+            else:
+                if rate_limit_tokens_consumed >= OPENAI_API_SOFT_LIMIT:
+                    # Not strictly accurate as it's a rolling 60sec window, but close enough
+                    wait_seconds = (60 - now.second) + 2
+                    print(f"Waiting {wait_seconds}s to stay inside rate limit ({rate_limit_tokens_consumed} tokens consumed already)")
+                    time.sleep(wait_seconds)
+                    rate_limit_tokens_consumed = 0
+
+            completion = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3,
+                max_tokens=2048,
+            )
+            rate_limit_tokens_consumed += completion["usage"]["total_tokens"]
+            return completion.choices[0].message["content"]
+  - cellType: CODE
+    cellId: 020a6add-0623-49c3-9547-c51a2a3ad458 # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: Query Semantic Layer over JDBC
+    config:
+      source: |-
+        !pip install adbc-driver-flightsql
+
+        jdbc_url = f"jdbc:arrow-flight-sql://semantic-layer.cloud.getdbt.com:443?environmentId=260751&token={DBT_SL_SERVICE_TOKEN}"
+
+        import os
+        import sys
+        from dataclasses import dataclass
+        from urllib.parse import parse_qs, urlparse
+
+        from adbc_driver_flightsql import DatabaseOptions
+        from adbc_driver_flightsql.dbapi import connect
+
+
+        @dataclass
+        class ConnAttr:
+            host: str  # "grpc+tls:semantic-layer.cloud.getdbt.com:443"
+            environment_id: str  # 42
+            token: str  # dbts_thisismyprivateservicetoken
+
+        def parse_jdbc_uri(uri):
+            """Helper function to convert the JDBC url into ConnAttr."""
+            parsed = urlparse(uri)
+            params = {k.lower(): v[0] for k, v in parse_qs(parsed.query).items()}
+            return ConnAttr(
+                host=parsed.path.replace("arrow-flight-sql", "grpc")
+                if params.pop("useencryption", None) == "false"
+                else parsed.path.replace("arrow-flight-sql", "grpc+tls"),
+                environment_id=params.pop('environmentid'),
+                token=params.pop('token'),
+            )
+
+        def execute_sl_query(query, db_opts=None, print_result=False):
+            """Execute a Semantic Layer query.
+
+            host must be in a format like: grpc+tls:semantic-layer.cloud.getdbt.com:443
+            db_opts is a dictionary of additional DB options to pass in
+            """
+            opts = db_opts or {}
+            
+            conn_attr = parse_jdbc_uri(jdbc_url)
+
+            try:
+                with connect(
+                    conn_attr.host,
+                    db_kwargs={
+                        DatabaseOptions.AUTHORIZATION_HEADER.value: f"Bearer {conn_attr.token}",
+                        f"{DatabaseOptions.RPC_CALL_HEADER_PREFIX.value}environmentid": conn_attr.environment_id,
+                        DatabaseOptions.WITH_COOKIE_MIDDLEWARE.value: "true",
+                        **opts
+                    },
+                ) as conn, conn.cursor() as cur:
+                    cur.execute(query)
+                    df = cur.fetch_df()  # fetches as Pandas DF, can also do fetch_arrow_table
+                    if print_result:
+                        print("df result:")
+                        print(df)
+                    return True, df   
+            except Exception as e:
+                error = pd.DataFrame({"error": [e]})
+                print(f"Query error: {str(e)}")
+                return False, error
+  - cellType: CODE
+    cellId: 9f861a20-2443-4b93-af7d-0b504611661e # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: Fetch SL metadata for prompt
+    config:
+      source: |-
+        import pandas as pd
+
+        def list_metrics():
+            list_metrics_query = """
+            select *
+            from {{
+                semantic_layer.metrics()
+            }}
+            """
+
+            return execute_sl_query(list_metrics_query)
+
+        def list_dimensions_for_metric(metric):
+            list_dimensions_query = """
+                select *
+                from {{
+                    semantic_layer.dimensions(
+                        metrics=['""" + metric + """']
+                    )
+                }}
+            """
+            return execute_sl_query(list_dimensions_query)
+
+        def list_entities_for_metric(metric):
+            list_entities_query = """
+                select *
+                from {{
+                    semantic_layer.entities(
+                        metrics=['""" + metric + """']
+                    )
+                }}
+            """
+            return execute_sl_query(list_entities_query)
+
+        def list_dimensions_for_metrics(list_metrics):
+            # Initialize an empty DataFrame to collect all dimensions
+            all_dimensions_df = pd.DataFrame()
+
+            # Get the list of metric names
+            metrics_list = list_metrics["NAME"].to_list()
+
+            # Loop through each metric and get its dimensions
+            for metric in metrics_list:
+                # Get dimensions for the current metric
+                dims_success, dimensions_df = list_dimensions_for_metric(metric)
+                
+                # If dimensions_df is not empty, append it to the collection DataFrame
+                if not dimensions_df.empty:
+                    all_dimensions_df = pd.concat([all_dimensions_df, dimensions_df[['NAME', 'DESCRIPTION']]], ignore_index=True)
+
+            # Drop duplicate rows based on the 'name' column from the combined DataFrame
+            all_dimensions_df = all_dimensions_df.drop_duplicates(subset=['NAME'])
+
+            # Now all_dimensions_df contains all unique dimensions across all metrics, without duplicates in the 'name' column
+            return all_dimensions_df
+
+        def list_entities_for_metrics(list_metrics):
+            # Initialize an empty DataFrame to collect all entities
+            all_entities_df = pd.DataFrame()
+
+            # Get the list of metric names
+            metrics_list = list_metrics["NAME"].to_list()
+
+            # Loop through each metric and get its entities
+            for metric in metrics_list:
+                # Get entities for the current metric
+                entity_success, entities_df = list_entities_for_metric(metric)
+                
+                # If entities_df is not empty, append it to the collection DataFrame
+                if not entities_df.empty:
+                    all_entities_df = pd.concat([all_entities_df, entities_df[['NAME', 'DESCRIPTION']]], ignore_index=True)
+
+            # Drop duplicate rows based on the 'NAME' column from the combined DataFrame
+            all_entities_df = all_entities_df.drop_duplicates(subset=['NAME'])
+
+            # Now all_entities_df contains all unique entities across all metrics, without duplicates in the 'NAME' column
+            return all_entities_df
+  - cellType: CODE
+    cellId: 3ec841e4-616e-4e6d-a569-346c6d659185 # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: Generate Semantic Layer query
+    config:
+      source: |-
+        
+        def generate_semantic_layer_query(question, metric_details, dimension_details, entity_details):
+            prompt = """
+            Queries to the dbt semantic layer look like this:
+
+            select * from {{
+                semantic_layer.query(metrics=['food_order_amount', 'order_gross_profit'], 
+                group_by=[Dimension('primary_entity__dimension').grain('month'), 'customer__customer_type'],
+                where="{{ Dimension('primary_entity__filter_dim_1') }} = 'A' AND {{ Dimension('secondary_entity__filter_dim_2') }} = False"
+                }}
+
+            Below is a markdown table describing the parameters available when building a query
+            | Parameter | Description  | Example    | Type |
+            | --------- | -----------| ------------ | -------------------- |
+            | `metrics`   | The metric name as defined in your dbt metric configuration   | `metrics=['revenue']` | Required    |
+            | `group_by`  | Dimension names or entities to group by. We require a reference to the entity of the dimension (other than for the primary time dimension), which is pre-appended to the front of the dimension name with a double underscore. | `group_by=['user__country', 'metric_time']`     | Optional   |
+            | `grain`   | A parameter specific to any time dimension and changes the grain of the data from the default for the metric. | `group_by=[Dimension('metric_time')` <br/> `grain('week\|day\|month\|quarter\|year')]` | Optional     |
+            | `where`     | A where clause that allows you to filter on dimensions and entities using parameters. This takes a filter list OR string. Inputs come with `Dimension`, and `Entity` objects. Granularity is required if the `Dimension` is a time dimension | "{{ where=Dimension('customer__country') }} = 'US')"   | Optional   |
+            | `limit`   | Limit the data returned    | `limit=10` | Optional  |
+            |`order`  | Order the data returned by a particular field     | `order_by=['order_gross_profit']`, use `-` for descending, or full object notation if the object is operated on: `order_by=[Metric('order_gross_profit').descending(True)`]   | Optional   |
+            | `compile`   | If true, returns generated SQL for the data platform but does not execute | `compile=True`   | Optional |
+
+            The following is the definition for the metrics and dimensions available to you in the dbt Semantic Layer, from a stringified dataframe. Metrics:
+
+            """
+
+            prompt += metric_details
+
+            prompt += """
+                Dimensions:
+            
+            """
+
+            prompt += dimension_details 
+
+            prompt += entity_details
+
+            prompt += """
+            Write a query to answer the following question. Do not explain the query, and do not say 'here is the query'. Return just the query, so it can be run
+            verbatim from your response.
+
+            Here's the question:
+            """
+
+            prompt += question
+
+            try:
+                generated_sl_query = execute_open_ai_prompt(prompt)
+                print(f"Generated SL query")
+                return True, generated_sl_query, prompt
+            except Exception as e:
+                return False, e, prompt
+  - cellType: CODE
+    cellId: 1cf74f07-ba88-4dd0-81b8-b9fb2a9eecf7 # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: Generate SQL query
+    config:
+      source: |-
+        def generate_sql_query(question):
+
+            prompt = f"""
+            Given the database described by the following DDL:
+            {sql_ddl}
+
+            Write a SQL query that answers the following question. Do not explain the query. return just the query, so it can be run
+            verbatim from your response.
+
+            Here's the question: 
+            {question}
+            """
+
+            try:
+                generated_sql = execute_open_ai_prompt(prompt)
+                print(f"Generated SQL")
+                return True, generated_sql
+            except Exception as e:
+                print(e)
+                return False, e
+  - cellType: CODE
+    cellId: 2cfd48c3-2cc0-4dc9-ad3f-662054a7898e # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: Compare Query Results
+    config:
+      source: |-
+        """"
+        The Gold dataframe is the expected result from the example query. 
+        Because the columns and rows can appear in an arbitrary order (and additional unnecessary columns can be returned),
+        we need to work out which columns belong together before determining Execution Accuracy. 
+
+        For each column in the gold dataframe, this goes through and finds a column in the comparison df that has the same datatype and contains 
+        the same values. Once that's established, the comparison df gets its rows and columns re-ordered so that it can be 
+        passed into the equals function.
+        """
+
+        import pandas as pd
+
+        def compare_query_results(gold_df, comparison):
+
+            # Sort columns alphabetically to simplify comparison at the other end 
+            alphabetical_gold_columns = sorted(gold_df.columns)
+
+            gold_comparison_column_map = {}
+            for gold_column in alphabetical_gold_columns:
+                gold_col_type = gold_df[gold_column].dtype
+                gold_col_vals = gold_df[gold_column].sort_values().reset_index(drop=True)
+                
+                for comparison_column in comparison.columns:
+                    if comparison_column in gold_comparison_column_map.keys():
+                        continue
+                    comparison_column_type = comparison[comparison_column].dtype
+                    if comparison_column_type == gold_col_type:
+                        comparison_column_values = comparison[comparison_column].sort_values().reset_index(drop=True)
+                        match = gold_col_vals.equals(comparison_column_values)
+                        if match:
+                            gold_comparison_column_map[comparison_column] = gold_column
+                            break
+                  
+            # Rename the comparison columns based on the established matches
+            comparison = comparison.rename(columns=gold_comparison_column_map)
+
+            # Remove any extra columns provided by the comparison query and order the columns alphabetically
+            comparison = comparison[alphabetical_gold_columns].copy()
+
+            # Order gold_df's columns alphabetically (there are no extra columns to remove)
+            gold_df = gold_df.reindex(columns=alphabetical_gold_columns)
+
+            # Sort the row values for final comparison
+            gold_df = gold_df.sort_values(by=alphabetical_gold_columns).reset_index(drop=True)
+            comparison = comparison.sort_values(by=alphabetical_gold_columns).reset_index(drop=True)
+
+            # Result for entire test run
+            return gold_df.equals(comparison)
+  - cellType: CODE
+    cellId: 92501bd9-23f3-42a9-b01f-2825e02f7755 # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: Generate Charts
+    config:
+      source: |-
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        # Make the chart x labels prettier by adding a line break halfway through the challenge text
+        def insert_line_break(s):
+            half_length = len(s) // 2
+            space_index = s.rfind(' ', 0, half_length)
+            if space_index != -1:
+                return s[:space_index] + '\n' + s[space_index + 1:]
+            return s[:half_length] + '\n' + s[half_length:]
+
+        vectorized_insert_line_break = np.vectorize(insert_line_break)
+
+        def render_df_as_chart(results_df):
+            # Count the occurrences of each combination of challenge_text and is_equivalent
+            semantic_equivalent = results_df.groupby(['display_text', 'is_semantic_result_equivalent']).size().unstack(fill_value=0)
+            if True not in semantic_equivalent.columns:
+                semantic_equivalent[True] = 0
+            if False not in semantic_equivalent.columns:
+                semantic_equivalent[False] = 0
+            # Sort the columns True, False     
+            semantic_equivalent = semantic_equivalent.sort_index(level=0, axis=1, ascending=False)
+
+            sql_equivalent = results_df.groupby(['display_text', 'is_sql_result_equivalent']).size().unstack(fill_value=0)
+            if True not in sql_equivalent.columns:
+                sql_equivalent[True] = 0
+            if False not in sql_equivalent.columns:
+                sql_equivalent[False] = 0
+            # Sort the columns True, False 
+            sql_equivalent = sql_equivalent.sort_index(level=0, axis=1, ascending=False)
+
+            # Get unique challenge_text values for setting x-axis ticks
+            unique_challenge_text = results_df['challenge_text'].unique()
+            unique_challenge_text = vectorized_insert_line_break(unique_challenge_text)
+
+            fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(10,10), sharex=True)
+
+            # Plot for semantic_equivalent
+            semantic_equivalent.plot(kind='bar', ax=axes[0], legend=True)
+            axes[0].set_title('Semantic Layer Generates Correct Response')
+            axes[0].set_ylabel('# Runs')
+            axes[0].legend(loc='center left', bbox_to_anchor=(1, 0.5), title="Successful\nGeneration")
+
+
+            # Plot for is_sql_equivalent
+            sql_equivalent.plot(kind='bar', ax=axes[1], legend=True)
+            axes[1].set_title('SQL Generates Correct Response')
+            axes[1].set_ylabel('# Runs')
+            axes[1].legend(loc='center left', bbox_to_anchor=(1, 0.5), title="Successful\nGeneration")
+
+
+            # Adjust layout
+            plt.tight_layout()
+
+            # Show the plot
+            plt.show()
+  - cellType: CODE
+    cellId: be6de125-4dad-4d8d-a913-090e51c9254e # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: Run Tests
+    config:
+      source: |
+        import time
+        import warnings
+        from IPython.display import clear_output
+        warnings.filterwarnings("ignore")
+
+        list_success, all_metrics = list_metrics()
+
+        metric_details = all_metrics.to_string()
+        dimension_details = list_dimensions_for_metrics(all_metrics).to_string()
+        entity_details = list_entities_for_metrics(all_metrics).to_string()
+
+        results_df = pd.DataFrame(
+            columns=[
+                "title",
+                "challenge_text",
+                "display_text",
+                "invocation_timestamp",
+                "iteration_num",
+                # queries
+                "gold_query_text",
+                "generated_sql_query_text",
+                "generated_semantic_query_text",
+                #dataframes
+                "gold_query_df",
+                "generated_sql_df",
+                "generated_semantic_df",
+                #results
+                "is_sql_result_equivalent",
+                "is_semantic_result_equivalent",
+                "sql_comparison_exception",
+                "semantic_comparison_exception",
+                "sl_prompt"
+            ]
+        )
+
+        for i in range(number_of_iterations):
+            for index, row in filtered_challenges.iterrows():
+                invocation_timestamp = time.time()
+                title = row["title"]
+                challenge_text = row["challenge_text"]
+                gold_query_text = row["gold_query_text"]
+
+                print()
+                print(f"Iteration {i}: {challenge_text}")
+
+
+                gold_df = pd.DataFrame()
+                sql_comparison = pd.DataFrame()
+                semantic_layer_comparison = pd.DataFrame()
+                is_sql_result_equivalent = False
+                is_semantic_result_equivalent = False
+                sql_comparison_exception = None
+                sem_layer_comparison_exception = None
+
+                waiting_for_gen_sql = True
+                generated_sql_query = None
+                while(waiting_for_gen_sql):
+                    gen_sql_success, gen_sql = generate_sql_query(challenge_text)
+                    if gen_sql_success:
+                        waiting_for_gen_sql = False
+                        generated_sql_query = gen_sql
+                    else:
+                        print(f"Retrying SQL generation due to OpenAI error: {gen_sql}")
+                    time.sleep(5)
+                
+                waiting_for_gen_semlayer = True 
+                generated_semantic_query = None
+                while (waiting_for_gen_semlayer):
+                    gen_semlayer_success, gen_semlayer, gen_semlayer_prompt = generate_semantic_layer_query(
+                        challenge_text, metric_details, dimension_details, entity_details
+                    )
+                    if gen_semlayer_success:
+                        waiting_for_gen_semlayer = False
+                        generated_semantic_query = gen_semlayer
+                    else:
+                        print(f"Retrying Semantic Layer Query generation due to OpenAI error: {gen_semlayer}")
+                    time.sleep(5)
+
+                gold_df_success, gold_df = execute_sl_query(str(gold_query_text))
+                sql_comp_success, sql_comparison = execute_sl_query(str(generated_sql_query))
+                semlayer_comp_success, semantic_layer_comparison = execute_sl_query(str(generated_semantic_query))
+
+                try:
+                    if gold_df_success and sql_comp_success:
+                        print("Comparing SQL query")
+                        is_sql_result_equivalent = compare_query_results(gold_df, sql_comparison)
+                        print(f"  {'✅' if is_sql_result_equivalent else '❌'}")
+
+                    else:
+                        print("Not comparing SQL query as it failed")
+                except Exception as e:
+                    sql_comparison_exception = str(e)
+                    print("  ❌")
+
+                try:
+                    if gold_df_success and semlayer_comp_success:
+                        print("Comparing Semantic Layer")
+                        is_semantic_result_equivalent = compare_query_results(
+                            gold_df, semantic_layer_comparison
+                        )
+                        print(f"  {'✅' if is_semantic_result_equivalent else '❌'}")
+                    else:
+                        print("Not comparing Semantic Layer as it failed")
+                except Exception as e:
+                    sem_layer_comparison_exception = str(e)
+                    print("  ❌")
+
+                results_df = results_df.append(
+                    {
+                        "title": title,
+                        "challenge_text": challenge_text,
+                        "display_text": insert_line_break(challenge_text),
+                        "invocation_timestamp": invocation_timestamp,
+                        "iteration_num": i,
+                        "gold_query_text": gold_query_text,
+                        "generated_sql_query_text": generated_sql_query,
+                        "generated_semantic_query_text": generated_semantic_query,
+                        "gold_query_df": gold_df.to_string(),
+                        "generated_sql_df": sql_comparison.to_string(),
+                        "generated_semantic_df": semantic_layer_comparison.to_string(),
+                        "is_sql_result_equivalent": is_sql_result_equivalent,
+                        "is_semantic_result_equivalent": is_semantic_result_equivalent,
+                        "sql_comparison_exception": sql_comparison_exception,
+                        "semantic_comparison_exception": sem_layer_comparison_exception,
+                        "sl_prompt": gen_semlayer_prompt
+
+                    },
+                    ignore_index=True,
+                )
+                clear_output(wait=True)
+                render_df_as_chart(results_df)
+  - cellType: CODE
+    cellId: 6a6b9156-c82d-4d4c-80f7-28c28e64b817 # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: Results for most recent run
+    config:
+      source: results_df
+  - cellType: SQL
+    cellId: e2dd9ecf-b6b4-45ef-a5ba-cc6a20addc16 # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: Unioned results of all runs
+    config:
+      source: |-
+        with unioned as (
+            select * from "results_pt1.csv"
+            union all 
+            select * from "results_pt2.csv"
+            union all 
+            select * from "results_pt3.csv"
+            union all 
+            select * from "results_pt4.csv"
+        )
+
+        select 
+            *, challenge_text in (
+                'How many claims have been placed by policy number?',
+                'What is the average time to settle a claim by policy number?',
+                'What is the average policy size which is the the total amount of premium divided by the number of policies?'
+            ) as too_many_mf_hops
+         from unioned
+      dataFrameCell: true
+      dataConnectionId: null
+      resultVariableName: dataframe
+      useRichDisplay: false
+      sqlCellOutputType: PANDAS
+      useQueryMode: false
+      castDecimals: true
+      useNativeDates: true
+      outputFilteredResult: true
+      allowDuplicateColumns: false
+      tableDisplayConfig: null
+  - cellType: CODE
+    cellId: 60176005-1a98-450a-8ac9-26a4dc758371 # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: null
+    config:
+      source: render_df_as_chart(dataframe)
+  - cellType: SQL
+    cellId: 70985dd5-db55-4125-ae65-750b76cca154 # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: null
+    config:
+      source: |-
+        with unioned_results as (
+            select * from dataframe
+        )
+
+        select 
+            too_many_mf_hops, 
+            sum(case when is_sql_result_equivalent then 1 else 0 end) as sql_success_count,
+            sum(case when is_semantic_result_equivalent then 1 else 0 end) as semantic_layer_success_count,
+            count(*) as num_runs,
+            sql_success_count / num_runs as sql_percentage,
+            semantic_layer_success_count / num_runs as semantic_percentage
+        from unioned_results
+        group by 1
+      dataFrameCell: true
+      dataConnectionId: null
+      resultVariableName: dataframe_2
+      useRichDisplay: false
+      sqlCellOutputType: PANDAS
+      useQueryMode: false
+      castDecimals: true
+      useNativeDates: true
+      outputFilteredResult: true
+      allowDuplicateColumns: false
+      tableDisplayConfig: null
+  - cellType: BLOCK
+    cellId: 93461f83-8be7-47d3-8073-7f920c9f59cd # DO NOT CHANGE - Hex uses this to match up cells when reimporting the file, and detect any changes to existing cells
+    cellLabel: null
+    config:
+      blockConfig:
+        sqlCellId: 3db11d10-831c-4464-9d25-578291eaf1e0
+        chartCellId: 83a64789-b381-44fe-8c0f-18afeee08f1f
+        activeTab: preview
+      cells:
+        - cellType: SQL
+          cellId: 3db11d10-831c-4464-9d25-578291eaf1e0
+          cellLabel: null
+          config:
+            source: |-
+              with unioned_results as (
+                  select * from dataframe
+              ),
+
+              calculations as (
+                  select 
+                      challenge_text, 
+                      count(distinct generated_sql_query_text) as unique_sql_variants,
+                      count(distinct generated_semantic_query_text) as unique_semlayer_variants,
+                      sum(case when is_sql_result_equivalent then 1 else 0 end) as sql_success_count,
+                      sum(case when is_semantic_result_equivalent then 1 else 0 end) as semantic_layer_success_count,
+                      count(1.0) as num_runs,
+                      sql_success_count / num_runs as sql_success_percentage,
+                      semantic_layer_success_count / num_runs as semlayer_success_percentage
+                  from unioned_results
+                  group by 1
+              )
+
+              select 
+                  challenge_text,
+                  unique_sql_variants,
+                  sql_success_percentage,
+                  unique_semlayer_variants,
+                  semlayer_success_percentage
+              from calculations
+            dataFrameCell: true
+            dataConnectionId: null
+            resultVariableName: dataframe_3
+            useRichDisplay: false
+            sqlCellOutputType: PANDAS
+            useQueryMode: false
+            castDecimals: true
+            useNativeDates: true
+            outputFilteredResult: true
+            allowDuplicateColumns: false
+            tableDisplayConfig:
+              pageSize: 50
+              height: null
+              hideIcons: false
+              hideIndex: false
+              defaultSortColumn: null
+              defaultSortIndexColumn: null
+              defaultSortDirection: ASC
+              conditionalFormatting: null
+              filters: null
+              columnProperties: []
+              columnOrdering: null
+              pinnedColumns: null
+              hiddenColumns: null
+        - cellType: CHARTV2
+          cellId: 83a64789-b381-44fe-8c0f-18afeee08f1f
+          cellLabel: null
+          config:
+            height: null
+            chartSpec:
+              type: layered
+              layers:
+                - id: e351237b-ca3f-47b2-9dac-7d162e111e31
+                  xAxis:
+                    type: string
+                    style:
+                      grid:
+                        style: solid
+                      ticks: {}
+                      labels: {}
+                  series:
+                    - id: f4b90e85-09d2-468b-8046-45f81936627e
+                      type: line
+                      axis:
+                        type: number
+                        style:
+                          ticks: {}
+                          labels: {}
+                        aggregate: sum
+                      dataFrameColumns: []
+                      colorOrder: ascending
+                      color:
+                        type: static
+                        color: "#F58518"
+                      opacity:
+                        type: static
+                        value: 1
+                      tooltip:
+                        type: auto
+                      point: false
+                      stroke: solid
+                  dataFrame: dataframe_3
+              settings:
+                legend:
+                  position: right
+                tooltip: true
+                selectionEnabled: false
+            chartSelection: {}
+            colorMappings: {}
+            resultVariable: filter_result
+            outputResult: false
+            displayTableConfig: null
+appLayout:
+  visibleMetadataFields:
+    - DESCRIPTION
+    - LAST_EDITED
+    - LAST_RUN
+    - CATEGORIES
+    - STATUS
+    - TABLE_OF_CONTENTS
+    - AUTHOR
+    - NAME
+  fullWidth: false
+  tabs:
+    - name: Tab 1
+      rows:
+        - columns:
+            - start: 0
+              end: 120
+              elements:
+                - showSource: false
+                  hideOutput: false
+                  type: CELL
+                  cellId: a7cadd10-afb7-4be9-956f-0fb4d1e057ee
+                  sharedFilterId: null
+                  height: null
+                  showLabel: true
+        - columns:
+            - start: 0
+              end: 30
+              elements:
+                - showSource: false
+                  hideOutput: false
+                  type: CELL
+                  cellId: ada1c573-1b0d-4d24-bec4-7e0db5bd7302
+                  sharedFilterId: null
+                  height: null
+                  showLabel: true
+        - columns:
+            - start: 0
+              end: 120
+              elements:
+                - showSource: false
+                  hideOutput: false
+                  type: CELL
+                  cellId: e2dd9ecf-b6b4-45ef-a5ba-cc6a20addc16
+                  sharedFilterId: null
+                  height: null
+                  showLabel: true
+        - columns:
+            - start: 0
+              end: 120
+              elements:
+                - showSource: false
+                  hideOutput: false
+                  type: CELL
+                  cellId: 60176005-1a98-450a-8ac9-26a4dc758371
+                  sharedFilterId: null
+                  height: null
+                  showLabel: true
+sharedFilters: []
