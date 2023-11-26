@@ -1,6 +1,6 @@
 ## About the repo
 
-This repo is an accompaniment to [this Roundup article](https://roundup.getdbt.com) and extends the work done in _A Benchmark to Understand the Role of Knowledge Graphs on Large Language Model's Accuracy for Question Answering on Enterprise SQL Databases_, [a preprint on arxiv.org](https://arxiv.org/pdf/2311.07509.pdf) from the team at data.world.
+This repo is an accompaniment to [this Roundup article](https://roundup.getdbt.com/p/semantic-layer-as-the-data-interface) and extends the work done in _A Benchmark to Understand the Role of Knowledge Graphs on Large Language Model's Accuracy for Question Answering on Enterprise SQL Databases_, [a preprint on arxiv.org](https://arxiv.org/pdf/2311.07509.pdf) from the team at data.world.
 
 ## About the experiment
 
