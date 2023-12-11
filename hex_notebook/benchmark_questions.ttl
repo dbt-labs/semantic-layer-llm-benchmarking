@@ -203,11 +203,11 @@ dwt:IQ_612b36a4405487ec34831e093e2494dc
 dwt:query-578baedd-93d7-46b0-b7ab-ca1f91b383d6
         rdf:type          dwt:SqlQuery ;
         QandA:inLanguage  QandA:SQL ;
-        QandA:queryText   "select policy_number, avg(DATE_DIFF(claim_open_date, claim_close_date, \"day\"))\nfrom claim \ninner join claim_coverage on claim.claim_identifier = claim_coverage.claim_identifier\ninner join policy_coverage_detail on claim_coverage.policy_coverage_detail_identifier = policy_coverage_detail.policy_coverage_detail_identifier\ninner join policy on policy.policy_identifier = policy_coverage_detail.policy_identifier\nwhere claim_close_date IS NOT NULL\ngroup by policy_number\n" ;
+        QandA:queryText   "select policy_number, avg(DATEDIFF(\"day\", claim_open_date, claim_close_date))\nfrom claim \ninner join claim_coverage on claim.claim_identifier = claim_coverage.claim_identifier\ninner join policy_coverage_detail on claim_coverage.policy_coverage_detail_identifier = policy_coverage_detail.policy_coverage_detail_identifier\ninner join policy on policy.policy_identifier = policy_coverage_detail.policy_identifier\nwhere claim_close_date IS NOT NULL\ngroup by policy_number\n" ;
         dct:description   "What is the average time to settle a claim by policy number?" ;
         dct:title         "HQLS: What is the average time to settle a claim by policy number?" ;
         dwt:agentId       "myinsurancecompany" ;
-        dwt:content       "select policy_number, avg(DATE_DIFF(claim_open_date, claim_close_date, \"day\"))\nfrom claim \ninner join claim_coverage on claim.claim_identifier = claim_coverage.claim_identifier\ninner join policy_coverage_detail on claim_coverage.policy_coverage_detail_identifier = policy_coverage_detail.policy_coverage_detail_identifier\ninner join policy on policy.policy_identifier = policy_coverage_detail.policy_identifier\nwhere claim_close_date IS NOT NULL\ngroup by policy_number\n" ;
+        dwt:content       "select policy_number, avg(DATEDIFF(\"day\", claim_open_date, claim_close_date))\nfrom claim \ninner join claim_coverage on claim.claim_identifier = claim_coverage.claim_identifier\ninner join policy_coverage_detail on claim_coverage.policy_coverage_detail_identifier = policy_coverage_detail.policy_coverage_detail_identifier\ninner join policy on policy.policy_identifier = policy_coverage_detail.policy_identifier\nwhere claim_close_date IS NOT NULL\ngroup by policy_number\n" ;
         dwt:projectId     "chat-with-the-data-benchmark" .
 
 dwt:query-834df433-2024-45af-8b55-97e2d206f15e
