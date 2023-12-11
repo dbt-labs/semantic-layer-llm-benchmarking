@@ -1,4 +1,4 @@
-﻿title,challenge_text,display_text,invocation_timestamp,iteration_num,gold_query_text,generated_sql_query_text,generated_semantic_query_text,gold_query_df,generated_sql_df,generated_semantic_df,is_sql_result_equivalent,is_semantic_result_equivalent,sql_comparison_exception,semantic_comparison_exception
+title,challenge_text,display_text,invocation_timestamp,iteration_num,gold_query_text,generated_sql_query_text,generated_semantic_query_text,gold_query_df,generated_sql_df,generated_semantic_df,is_sql_result_equivalent,is_semantic_result_equivalent,sql_comparison_exception,semantic_comparison_exception
 HQLS: Claim,How many claims do we have?,"How many
 claims do we have?",1700624974.5562727,0,"SELECT COUNT(*) AS NoOfClaims
 FROM claim",SELECT COUNT(*) FROM Claim,"select * from {{
@@ -54,10 +54,10 @@ WHERE Claim.Claim_Close_Date IS NOT NULL
 GROUP BY Policy.Policy_Number","select * from {{
     semantic_layer.query(metrics=['avg_time_to_settle_claim'], 
     group_by=['policy__policy_number'])
-}}","                                                                                                                                     error
-0  INVALID_ARGUMENT: [FlightSQL] SQL compilation error: error line 1 at position 71\ninvalid identifier '""day""' (InvalidArgument; Prepare)","   POLICY_NUMBER AVERAGE_SETTLEMENT_TIME
+}}","   POLICY_NUMBER  AVG(DATEDIFF(DAY, CLAIM_OPEN_DATE, CLAIM_CLOSE_DATE))
+0    31003000336                                               20.5    ","   POLICY_NUMBER AVERAGE_SETTLEMENT_TIME
 0    31003000336               20.500000","                                                                                                                                                                                                                                                                                                                                                                                                                 error
-0  INVALID_ARGUMENT: [FlightSQL] Unable To Satisfy Query Error: Dimensions ['policy__policy_number'] cannot be resolved for metrics ['avg_time_to_settle_claim']. The invalid dimension may not exist, require an ambiguous join (e.g. a join path that can be satisfied in multiple ways), or require a fanout join.\n\nSuggestions for invalid dimension 'policy__policy_number':\n    [] (InvalidArgument; Prepare)",false,false,,
+0  INVALID_ARGUMENT: [FlightSQL] Unable To Satisfy Query Error: Dimensions ['policy__policy_number'] cannot be resolved for metrics ['avg_time_to_settle_claim']. The invalid dimension may not exist, require an ambiguous join (e.g. a join path that can be satisfied in multiple ways), or require a fanout join.\n\nSuggestions for invalid dimension 'policy__policy_number':\n    [] (InvalidArgument; Prepare)",true,false,,
 HQLS: Policy - Coverage - Premium,What is the average policy size which is the the total amount of premium divided by the number of policies?,"What is the average policy size which is the the
 total amount of premium divided by the number of policies?",1700625047.3495574,0,"SELECT
     SUM(policy_amount)/COUNT(DISTINCT policy_number) AS avgPolicySize
@@ -249,10 +249,10 @@ WHERE Claim.Claim_Close_Date IS NOT NULL
 GROUP BY Policy.Policy_Number","select * from {{
     semantic_layer.query(metrics=['avg_time_to_settle_claim'], 
     group_by=['policy__policy_number'])
-}}","                                                                                                                                     error
-0  INVALID_ARGUMENT: [FlightSQL] SQL compilation error: error line 1 at position 71\ninvalid identifier '""day""' (InvalidArgument; Prepare)","   POLICY_NUMBER AVERAGE_SETTLEMENT_DAYS
+}}","   POLICY_NUMBER  AVG(DATEDIFF(DAY, CLAIM_OPEN_DATE, CLAIM_CLOSE_DATE))
+0    31003000336                                               20.5    ","   POLICY_NUMBER AVERAGE_SETTLEMENT_DAYS
 0    31003000336               20.500000","                                                                                                                                                                                                                                                                                                                                                                                                                 error
-0  INVALID_ARGUMENT: [FlightSQL] Unable To Satisfy Query Error: Dimensions ['policy__policy_number'] cannot be resolved for metrics ['avg_time_to_settle_claim']. The invalid dimension may not exist, require an ambiguous join (e.g. a join path that can be satisfied in multiple ways), or require a fanout join.\n\nSuggestions for invalid dimension 'policy__policy_number':\n    [] (InvalidArgument; Prepare)",false,false,,
+0  INVALID_ARGUMENT: [FlightSQL] Unable To Satisfy Query Error: Dimensions ['policy__policy_number'] cannot be resolved for metrics ['avg_time_to_settle_claim']. The invalid dimension may not exist, require an ambiguous join (e.g. a join path that can be satisfied in multiple ways), or require a fanout join.\n\nSuggestions for invalid dimension 'policy__policy_number':\n    [] (InvalidArgument; Prepare)",true,false,,
 HQLS: Policy - Coverage - Premium,What is the average policy size which is the the total amount of premium divided by the number of policies?,"What is the average policy size which is the the
 total amount of premium divided by the number of policies?",1700625307.2253232,1,"SELECT
     SUM(policy_amount)/COUNT(DISTINCT policy_number) AS avgPolicySize
@@ -449,8 +449,8 @@ WHERE Claim_Close_Date IS NOT NULL
 GROUP BY Policy_Number;","select * from {{
     semantic_layer.query(metrics=['avg_time_to_settle_claim'], 
     group_by=['policy__policy_number'])
-    }}","                                                                                                                                     error
-0  INVALID_ARGUMENT: [FlightSQL] SQL compilation error: error line 1 at position 71\ninvalid identifier '""day""' (InvalidArgument; Prepare)","   POLICY_NUMBER AVG_SETTLE_TIME
+    }}","   POLICY_NUMBER  AVG(DATEDIFF(DAY, CLAIM_OPEN_DATE, CLAIM_CLOSE_DATE))
+0    31003000336                                               20.5    ","   POLICY_NUMBER AVG_SETTLE_TIME
 0    31003000336       16.000000
 1    31003000337       25.000000","                                                                                                                                                                                                                                                                                                                                                                                                                 error
 0  INVALID_ARGUMENT: [FlightSQL] Unable To Satisfy Query Error: Dimensions ['policy__policy_number'] cannot be resolved for metrics ['avg_time_to_settle_claim']. The invalid dimension may not exist, require an ambiguous join (e.g. a join path that can be satisfied in multiple ways), or require a fanout join.\n\nSuggestions for invalid dimension 'policy__policy_number':\n    [] (InvalidArgument; Prepare)",false,false,,
@@ -648,8 +648,8 @@ WHERE Claim_Close_Date IS NOT NULL
 GROUP BY Policy_Number;","select * from {{
     semantic_layer.query(metrics=['avg_time_to_settle_claim'], 
     group_by=['policy__policy_number'])
-    }}","                                                                                                                                     error
-0  INVALID_ARGUMENT: [FlightSQL] SQL compilation error: error line 1 at position 71\ninvalid identifier '""day""' (InvalidArgument; Prepare)","   POLICY_NUMBER AVERAGE_SETTLEMENT_TIME
+    }}","   POLICY_NUMBER  AVG(DATEDIFF(DAY, CLAIM_OPEN_DATE, CLAIM_CLOSE_DATE))
+0    31003000336                                               20.5    ","   POLICY_NUMBER AVERAGE_SETTLEMENT_TIME
 0    31003000336               16.000000
 1    31003000337               25.000000","                                                                                                                                                                                                                                                                                                                                                                                                                 error
 0  INVALID_ARGUMENT: [FlightSQL] Unable To Satisfy Query Error: Dimensions ['policy__policy_number'] cannot be resolved for metrics ['avg_time_to_settle_claim']. The invalid dimension may not exist, require an ambiguous join (e.g. a join path that can be satisfied in multiple ways), or require a fanout join.\n\nSuggestions for invalid dimension 'policy__policy_number':\n    [] (InvalidArgument; Prepare)",false,false,,
@@ -861,10 +861,10 @@ GROUP BY
     Policy.Policy_Number;","select * from {{
     semantic_layer.query(metrics=['avg_time_to_settle_claim'], 
     group_by=['policy__policy_number'])
-    }}","                                                                                                                                     error
-0  INVALID_ARGUMENT: [FlightSQL] SQL compilation error: error line 1 at position 71\ninvalid identifier '""day""' (InvalidArgument; Prepare)","   POLICY_NUMBER AVERAGE_SETTLEMENT_DAYS
+    }}","   POLICY_NUMBER  AVG(DATEDIFF(DAY, CLAIM_OPEN_DATE, CLAIM_CLOSE_DATE))
+0    31003000336                                               20.5    ","   POLICY_NUMBER AVERAGE_SETTLEMENT_DAYS
 0    31003000336               20.500000","                                                                                                                                                                                                                                                                                                                                                                                                                 error
-0  INVALID_ARGUMENT: [FlightSQL] Unable To Satisfy Query Error: Dimensions ['policy__policy_number'] cannot be resolved for metrics ['avg_time_to_settle_claim']. The invalid dimension may not exist, require an ambiguous join (e.g. a join path that can be satisfied in multiple ways), or require a fanout join.\n\nSuggestions for invalid dimension 'policy__policy_number':\n    [] (InvalidArgument; Prepare)",false,false,,
+0  INVALID_ARGUMENT: [FlightSQL] Unable To Satisfy Query Error: Dimensions ['policy__policy_number'] cannot be resolved for metrics ['avg_time_to_settle_claim']. The invalid dimension may not exist, require an ambiguous join (e.g. a join path that can be satisfied in multiple ways), or require a fanout join.\n\nSuggestions for invalid dimension 'policy__policy_number':\n    [] (InvalidArgument; Prepare)",true,false,,
 HQLS: Policy - Coverage - Premium,What is the average policy size which is the the total amount of premium divided by the number of policies?,"What is the average policy size which is the the
 total amount of premium divided by the number of policies?",1700626112.667178,4,"SELECT
     SUM(policy_amount)/COUNT(DISTINCT policy_number) AS avgPolicySize
