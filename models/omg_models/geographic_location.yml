@@ -1,0 +1,22 @@
+models:
+  - name: geographic_location
+    description: This model provides detailed information about geographic locations, including identifiers, types, and addresses, which can be used for mapping and location-based analysis.
+    columns:
+      - name: geographic_location_identifier
+        description: A unique identifier for each geographic location.
+      - name: parent_geographic_location_identifier
+        description: The identifier for the parent geographic location, indicating a hierarchical relationship.
+      - name: geographic_location_type_code
+        description: A code representing the type of geographic location, such as city or state.
+      - name: location_code
+        description: A code used to uniquely identify a specific location.
+      - name: location_name
+        description: The name of the geographic location.
+      - name: location_number
+        description: A number assigned to the location for identification purposes.
+      - name: state_code
+        description: The code representing the state in which the location is situated.
+      - name: location_address_identifier
+        description: An identifier for the address associated with the location.
+      - name: physical_location_identifier
+        description: An identifier for the physical location, used for precise mapping.

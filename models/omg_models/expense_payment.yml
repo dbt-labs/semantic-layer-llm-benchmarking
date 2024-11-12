@@ -1,0 +1,6 @@
+models:
+  - name: expense_payment
+    description: This model extracts the claim amount identifier from the expense payment data, which is used to uniquely identify each claim amount in the dataset.
+    columns:
+      - name: claim_amount_identifier
+        description: A unique identifier for each claim amount in the expense payment data.

@@ -1,0 +1,8 @@
+models:
+  - name: agreement_assessment
+    description: This model extracts and provides identifiers for agreements and their assessments, facilitating the tracking and analysis of agreement-related assessments.
+    columns:
+      - name: agreement_identifier
+        description: A unique identifier for each agreement, used to track and reference specific agreements.
+      - name: assessment_identifier
+        description: A unique identifier for each assessment, used to track and reference specific assessments related to agreements.

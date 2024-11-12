@@ -1,0 +1,22 @@
+models:
+  - name: fire_claim
+    description: This model provides detailed information about fire insurance claims, including policy details, claim specifics, and risk factors associated with the insured location.
+    columns:
+      - name: policyno
+        description: The unique identifier for the insurance policy.
+      - name: claimnumber
+        description: The unique identifier for the insurance claim.
+      - name: premium
+        description: The amount paid for the insurance policy.
+      - name: insuredlocation
+        description: The location that is insured under the policy.
+      - name: loss_ratio
+        description: The ratio of losses incurred to the premiums earned, indicating the profitability of the insurance policy.
+      - name: nearest_firestation_miles
+        description: The distance in miles to the nearest fire station from the insured location, indicating potential response time in case of a fire.
+      - name: number_of_firefighters
+        description: The number of firefighters available at the nearest fire station.
+      - name: fireplace
+        description: Indicates whether the insured location has a fireplace, which may affect fire risk.
+      - name: year_built
+        description: The year the insured property was built, which can influence the risk assessment and premium calculations.

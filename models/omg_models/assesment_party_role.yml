@@ -1,0 +1,14 @@
+models:
+  - name: assesment_party_role
+    description: This model captures the roles associated with parties in various assessments, detailing the time frame of their involvement.
+    columns:
+      - name: party_identifier
+        description: A unique identifier for the party involved in the assessment.
+      - name: assessment_identifier
+        description: A unique identifier for the assessment linked to the party.
+      - name: party_role_code
+        description: The code representing the role of the party in the assessment.
+      - name: begin_date
+        description: The date when the party's role in the assessment began.
+      - name: end_date
+        description: The date when the party's role in the assessment ended.

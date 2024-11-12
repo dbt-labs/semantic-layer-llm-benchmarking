@@ -1,0 +1,20 @@
+models:
+  - name: occurrences
+    description: This model captures detailed information about various occurrences, including their identifiers, timing, location, and whether they are catastrophic events. It is useful for analyzing the characteristics and impacts of these occurrences.
+    columns:
+      - name: occurrence_identifier
+        description: A unique identifier for each occurrence.
+      - name: catastrophic_event_indicator
+        description: Indicates whether the occurrence is a catastrophic event (1 for yes, 0 for no).
+      - name: geographic_location_identifier
+        description: Identifies the geographic location associated with the occurrence.
+      - name: occurrence_begin_date
+        description: The date when the occurrence began.
+      - name: occurrence_end_date
+        description: The date when the occurrence ended.
+      - name: occurrence_begin_time
+        description: The time when the occurrence began, represented as a number.
+      - name: occurrence_end_time
+        description: The time when the occurrence ended, represented as a number.
+      - name: occurrence_name
+        description: A numeric representation of the occurrence's name.

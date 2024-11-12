@@ -1,0 +1,10 @@
+models:
+  - name: insurable_object
+    description: This model extracts and organizes data related to insurable objects, including their unique identifiers, geographic locations, and type codes, to facilitate risk assessment and insurance policy management.
+    columns:
+      - name: insurable_object_identifier
+        description: A unique identifier assigned to each insurable object for tracking and reference purposes.
+      - name: geographic_location_identifier
+        description: A numeric code representing the geographic location of the insurable object, used for regional analysis and risk assessment.
+      - name: insurable_object_type_code
+        description: A code indicating the type of insurable object, aiding in categorization and policy determination.

@@ -1,0 +1,6 @@
+models:
+  - name: loss_reserve
+    description: This model extracts the unique identifier for claim amounts from the loss reserve data, which is essential for tracking and managing insurance claims.
+    columns:
+      - name: claim_amount_identifier
+        description: A unique identifier for each claim amount, used to track individual claims in the loss reserve data.

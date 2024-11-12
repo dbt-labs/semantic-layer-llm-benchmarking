@@ -1,0 +1,14 @@
+models:
+  - name: catastrophe
+    description: This model provides a detailed overview of various catastrophes, including their identifiers, types, and associated industry and company codes. It is useful for analyzing and categorizing different catastrophic events.
+    columns:
+      - name: catastrophe_identifier
+        description: A unique number assigned to each catastrophe for identification purposes.
+      - name: catastrophe_type_code
+        description: A numerical code representing the type of catastrophe.
+      - name: catastrophe_name
+        description: The name given to the catastrophe, providing a descriptive label.
+      - name: industry_catastrophe_code
+        description: A code used to classify the catastrophe within industry standards.
+      - name: company_catastrophe_code
+        description: A code used by the company to categorize the catastrophe internally.

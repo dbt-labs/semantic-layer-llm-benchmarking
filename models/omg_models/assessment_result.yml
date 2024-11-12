@@ -1,0 +1,10 @@
+models:
+  - name: assessment_result
+    description: This model captures the results of assessments, linking each result to its respective assessment and categorizing the type of result.
+    columns:
+      - name: assessment_result_identifier
+        description: A unique identifier for each assessment result.
+      - name: assessment_identifier
+        description: A unique identifier for the assessment associated with the result.
+      - name: assessment_result_type_code
+        description: A code representing the type of assessment result.

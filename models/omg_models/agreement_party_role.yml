@@ -1,0 +1,14 @@
+models:
+  - name: agreement_party_role
+    description: This model captures the roles of parties involved in agreements, detailing the effective and expiration dates for each role.
+    columns:
+      - name: agreement_identifier
+        description: A unique identifier for each agreement.
+      - name: party_identifier
+        description: A unique identifier for each party involved in the agreement.
+      - name: party_role_code
+        description: A code representing the role of the party in the agreement.
+      - name: effective_date
+        description: The date when the party's role in the agreement becomes effective.
+      - name: expiration_date
+        description: The date when the party's role in the agreement expires.

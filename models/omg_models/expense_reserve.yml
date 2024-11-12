@@ -1,0 +1,6 @@
+models:
+  - name: expense_reserve
+    description: This model extracts the unique identifiers for claim amounts from the expense reserve data, which can be used for tracking and managing financial claims.
+    columns:
+      - name: claim_amount_identifier
+        description: A unique identifier for each claim amount, used to track individual financial claims in the expense reserve.

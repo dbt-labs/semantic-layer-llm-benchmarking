@@ -1,0 +1,10 @@
+models:
+  - name: claim_coverage
+    description: This model extracts and organizes claim coverage details, focusing on the unique identifiers for claims and their effective dates.
+    columns:
+      - name: claim_identifier
+        description: A unique identifier for each insurance claim.
+      - name: effective_date
+        description: The date when the insurance coverage becomes effective.
+      - name: policy_coverage_detail_identifier
+        description: A unique identifier for the specific details of the policy coverage associated with the claim.

@@ -1,0 +1,22 @@
+models:
+  - name: organizations
+    description: This model provides detailed information about organizations, including identifiers, names, and industry classifications, which can be used for business analysis and reporting.
+    columns:
+      - name: organization_identifier
+        description: A unique number assigned to each organization for identification purposes.
+      - name: industry_code
+        description: A numerical code representing the industry classification of the organization.
+      - name: organization_name
+        description: The official name of the organization.
+      - name: dun_and_bradstreet_identifier
+        description: A unique identifier assigned by Dun & Bradstreet for tracking business information.
+      - name: organization_type_code
+        description: A code indicating the type of organization, such as corporation or partnership.
+      - name: alternate_name
+        description: An alternative name or alias for the organization.
+      - name: organization_description
+        description: A brief description or summary of the organization's purpose or activities.
+      - name: acronym_name
+        description: An acronym or abbreviated name used to refer to the organization.
+      - name: industry_type_code
+        description: A code that specifies the type of industry the organization belongs to.

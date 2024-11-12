@@ -1,0 +1,18 @@
+models:
+  - name: claim_amount
+    description: This model extracts and organizes claim amount details from the source data, providing insights into various claim-related metrics.
+    columns:
+      - name: claim_amount_identifier
+        description: A unique identifier for each claim amount entry.
+      - name: claim_identifier
+        description: A unique identifier for each claim.
+      - name: claim_offer_identifier
+        description: A unique identifier for each claim offer associated with the claim.
+      - name: amount_type_code
+        description: A code representing the type of amount, such as estimated or actual.
+      - name: event_date
+        description: The date when the claim event occurred.
+      - name: claim_amount
+        description: The monetary value of the claim.
+      - name: insurance_type_code
+        description: A code indicating the type of insurance related to the claim.

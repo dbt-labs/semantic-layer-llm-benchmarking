@@ -1,0 +1,6 @@
+models:
+  - name: loss_payment
+    description: This model extracts the unique identifier for claim amounts from the loss payment data.
+    columns:
+      - name: claim_amount_identifier
+        description: A unique identifier for each claim amount in the loss payment dataset.

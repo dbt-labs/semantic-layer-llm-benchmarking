@@ -1,0 +1,12 @@
+models:
+  - name: agreement
+    description: This model extracts and organizes agreement data, providing key details such as type, name, inception date, and associated product identifier.
+    columns:
+      - name: agreement_type_code
+        description: The code representing the type of agreement.
+      - name: agreement_name
+        description: The name of the agreement.
+      - name: agreement_original_inception_date
+        description: The original date when the agreement was first established.
+      - name: product_identifier
+        description: The identifier for the product associated with the agreement.

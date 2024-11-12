@@ -1,0 +1,14 @@
+models:
+  - name: assessment
+    description: This model provides detailed information about assessments, including their identifiers, descriptions, and relevant dates. It is useful for tracking the lifecycle and purpose of each assessment.
+    columns:
+      - name: assessment_identifier
+        description: A unique identifier for each assessment.
+      - name: begin_date
+        description: The date when the assessment begins.
+      - name: assessment_description
+        description: A description of the assessment.
+      - name: end_date
+        description: The date when the assessment ends.
+      - name: assessment_reason_description
+        description: A description of the reason for the assessment.

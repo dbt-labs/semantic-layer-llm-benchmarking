@@ -1,0 +1,22 @@
+models:
+  - name: location_address
+    description: This model provides detailed address information for various locations, including identifiers, address lines, municipality, postal code, country, and state codes, as well as the validity period of the address.
+    columns:
+      - name: location_address_identifier
+        description: A unique identifier for each location address.
+      - name: line_1_address
+        description: The primary address line for the location.
+      - name: municipality_name
+        description: The name of the municipality where the location is situated.
+      - name: line_2_address
+        description: The secondary address line for the location, if applicable.
+      - name: postal_code
+        description: The postal code associated with the location.
+      - name: country_code
+        description: The code representing the country of the location.
+      - name: state_code
+        description: The code representing the state of the location.
+      - name: begin_date
+        description: The date when the address becomes valid.
+      - name: end_date
+        description: The date when the address is no longer valid.

@@ -1,0 +1,32 @@
+models:
+  - name: claim
+    description: This model provides detailed information about insurance claims, including identifiers, dates, and status codes, to facilitate tracking and analysis of claims data.
+    columns:
+      - name: claim_identifier
+        description: A unique identifier for each claim.
+      - name: catastrophe_identifier
+        description: An identifier for the catastrophe associated with the claim, if applicable.
+      - name: claim_description
+        description: A description of the claim.
+      - name: claims_made_date
+        description: The date when the claim was made.
+      - name: company_claim_number
+        description: The claim number assigned by the company.
+      - name: company_subclaim_number
+        description: The subclaim number assigned by the company.
+      - name: insurable_object_identifier
+        description: An identifier for the insurable object related to the claim.
+      - name: occurrence_identifier
+        description: An identifier for the occurrence related to the claim.
+      - name: entry_into_claims_made_program_date
+        description: The date when the claim was entered into the claims made program.
+      - name: claim_open_date
+        description: The date when the claim was opened.
+      - name: claim_close_date
+        description: The date when the claim was closed.
+      - name: claim_reopen_date
+        description: The date when the claim was reopened, if applicable.
+      - name: claim_status_code
+        description: A code representing the status of the claim.
+      - name: claim_reported_date
+        description: The date when the claim was reported.
