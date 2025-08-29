@@ -7,4 +7,4 @@ select
     Occurrence_Begin_Time,
     Occurrence_End_Time,
     Occurrence_Name
-from dbt_cdw_benchmark__seed.occurrence
+from {{ ref('Occurrence') }}

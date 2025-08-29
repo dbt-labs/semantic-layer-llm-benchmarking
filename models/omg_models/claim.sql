@@ -14,4 +14,4 @@ select
     Claim_Status_Code,
     Claim_Reported_Date
 from 
-    dbt_cdw_benchmark__seed.claim
+    {{ ref('Claim') }}

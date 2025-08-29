@@ -4,4 +4,4 @@ select
     Party_Role_Code,
     Begin_Date,
     End_Date
-from dbt_cdw_benchmark__seed.assesment_party_role
+from {{ ref('Assesment_Party_Role') }}

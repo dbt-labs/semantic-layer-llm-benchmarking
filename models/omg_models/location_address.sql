@@ -8,4 +8,4 @@ Country_Code,
 State_Code,
 Begin_Date,
 End_Date
-from dbt_cdw_benchmark__seed.location_address
+from {{ ref('Location_Address') }}

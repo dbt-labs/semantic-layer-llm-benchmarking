@@ -10,4 +10,4 @@ select
     Policy_Amount,
     Insurable_Object_Identifier,
     Insurance_Type_Code
-from dbt_cdw_benchmark__seed.policy_amount
+from {{ ref('Policy_Amount') }}

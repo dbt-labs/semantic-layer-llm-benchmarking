@@ -10,4 +10,4 @@ select
     Birth_Place_Name,
     Gender_Code,
     Prefix_Name
-from dbt_cdw_benchmark__seed.person
+from {{ ref('Person') }}

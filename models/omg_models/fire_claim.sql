@@ -8,4 +8,4 @@ select
     Number_of_Firefighters,
     Fireplace,
     Year_Built
-from dbt_cdw_benchmark__seed.fireclaim
+from {{ ref('FireClaim') }}

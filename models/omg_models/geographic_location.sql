@@ -8,4 +8,4 @@ select
     State_Code,
     Location_Address_Identifier,
     Physical_Location_Identifier
-from dbt_cdw_benchmark__seed.geographic_location
+from {{ ref('Geographic_Location') }}

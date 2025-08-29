@@ -5,4 +5,4 @@ select
     Effective_Date,
     Expiration_Date
 from 
-    dbt_cdw_benchmark__seed.agreement_party_role
+    {{ ref('Agreement_Party_Role') }}

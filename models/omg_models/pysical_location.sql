@@ -9,4 +9,4 @@ select
     Vertical_Accuracy_Value,
     Travel_Direction_Description,
     Location_Address_Identifier
-from dbt_cdw_benchmark__seed.physical_location
+from {{ ref('Physical_Location') }}

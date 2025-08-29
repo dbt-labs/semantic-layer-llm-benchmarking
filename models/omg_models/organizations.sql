@@ -8,4 +8,4 @@ select
     Organization_Description,
     Acronym_Name,
     Industry_Type_Code
-from dbt_cdw_benchmark__seed.organization
+from {{ ref('Organization') }}
