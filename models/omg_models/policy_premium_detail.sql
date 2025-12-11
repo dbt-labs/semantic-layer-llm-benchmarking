@@ -19,4 +19,5 @@ select
 from {{ ref('policy') }} p
 inner join {{ ref('policy_amount') }} pa
     on p.policy_identifier = pa.policy_identifier
-where pa.amount_type_code = 'PREM'  -- Filter for premium amounts only
+inner join {{ ref('premium') }} pr
+    on pa.policy_amount_identifier = pr.policy_amount_identifier  -- Filter for premium amounts only
